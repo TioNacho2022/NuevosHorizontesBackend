@@ -14,6 +14,8 @@
         public string Curso_ingreso { get; set; }
         public string Pendiente { get; set; }
         public string Genero { get; set; }
+        public int Curso_id { get; set; }
+        public string Continuidad { get; set; }
 
 
         public class EstudianteResponse
@@ -28,6 +30,8 @@
             public int Edad { get; set; }
             public string Curso_ingreso { get; set; }
             public string Genero { get; set; }
+            public int Curso_id { get; set; }
+            public string Continuidad { get; set; }
         }
 
         public class EstudianteGet { 
