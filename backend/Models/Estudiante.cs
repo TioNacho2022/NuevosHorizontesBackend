@@ -31,6 +31,7 @@
             public string Curso_ingreso { get; set; }
             public string Genero { get; set; }
             public int Curso_id { get; set; }
+            public Curso Curso { get; set; }
             public string Continuidad { get; set; }
         }
 

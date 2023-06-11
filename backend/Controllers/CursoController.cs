@@ -34,7 +34,6 @@ namespace backend.Controllers
                         {
                             Id = Convert.ToInt32(reader["id"]),
                             Nombre = reader["nombre"].ToString(),
-                            Sala_id = Convert.ToInt32(reader["sala_id"]),
                             Sala = new Sala()
                             {
                                 Id = Convert.ToInt32(reader["id"]),
@@ -54,5 +53,7 @@ namespace backend.Controllers
                 return BadRequest(new { error = "Error al conectar a la base de datos de Oracle: " + ex.Message });
             }
         }
+
+        
     }
 }

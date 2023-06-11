@@ -164,7 +164,11 @@ namespace backend.Controllers
                             Celular = reader.GetInt32(reader.GetOrdinal("celular"))
                         };
 
-                        return Ok(apoderado);
+                        return Ok(new{ 
+                            get = true,
+                            rol = "Apoderado",
+                            usuario = apoderado}
+                        );
                     }
                     else
                     {
