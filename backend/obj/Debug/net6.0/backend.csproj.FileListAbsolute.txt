@@ -60,3 +60,5 @@ C:\Users\hp\Desktop\Nuevos Horizontes\backend\backend\obj\Debug\net6.0\refint\ba
 C:\Users\hp\Desktop\Nuevos Horizontes\backend\backend\obj\Debug\net6.0\backend.pdb
 C:\Users\hp\Desktop\Nuevos Horizontes\backend\backend\obj\Debug\net6.0\backend.genruntimeconfig.cache
 C:\Users\hp\Desktop\Nuevos Horizontes\backend\backend\obj\Debug\net6.0\ref\backend.dll
+C:\Users\hp\Desktop\Nuevos Horizontes\backend\backend\bin\Debug\net6.0\Newtonsoft.Json.dll
+C:\Users\hp\Desktop\Nuevos Horizontes\backend\backend\bin\Debug\net6.0\Transbank.dll

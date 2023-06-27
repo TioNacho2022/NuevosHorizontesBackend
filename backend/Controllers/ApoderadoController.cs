@@ -267,6 +267,83 @@ namespace backend.Controllers
             }
         }
 
+        [HttpGet("{id}/Estudiantes")]
+        public IActionResult ObtenerApoderadoEstudiantes(int id)
+        {
+            try
+            {
+                using (OracleConnection connection = new OracleConnection(connectionString))
+                {
+                    connection.Open();
+
+                    string query = "SELECT * FROM detalle_apoderado WHERE apoderado_id= :id";
+                    OracleCommand command = new OracleCommand(query, connection);
+                    command.Parameters.Add(":id", OracleDbType.Int32).Value = id;
+
+                    OracleDataReader reader = command.ExecuteReader();
+
+                    List<DetalleApoderado.DetalleApoderadoGet> detalles_apoderado = new List<DetalleApoderado.DetalleApoderadoGet>();
+
+                    while (reader.Read())
+                    {
+                        DetalleApoderado.DetalleApoderadoGet detalle_apoderado = new DetalleApoderado.DetalleApoderadoGet
+                        {
+                            EstudianteId = reader.GetInt32(reader.GetOrdinal("estudiante_id")),
+                            
+                        };
+
+                        detalles_apoderado.Add(detalle_apoderado);
+                    }
+
+                    List<Estudiante.EstudianteResponse> estudiantes = new List<Estudiante.EstudianteResponse>();
+
+                    foreach (var estudiante in detalles_apoderado)
+                    {
+
+                        string query1 = "SELECT * FROM estudiante WHERE id=:id";
+
+                        OracleCommand command1 = new OracleCommand(query1, connection);
+                        command1.Parameters.Add(":id", OracleDbType.Int32).Value = estudiante.EstudianteId;
+                        OracleDataReader reader1 = command1.ExecuteReader();
+
+                        if(reader1.Read())
+                        {
+                            Estudiante.EstudianteResponse estudiante1 = new Estudiante.EstudianteResponse
+                            {
+                                Id = reader1.GetInt32(reader1.GetOrdinal("id")),
+                                Rut = reader1.GetString(reader1.GetOrdinal("rut")),
+                                P_nombre = reader1.GetString(reader1.GetOrdinal("p_nombre")),
+                                S_nombre = reader1.GetString(reader1.GetOrdinal("s_nombre")),
+                                Ap_paterno = reader1.GetString(reader1.GetOrdinal("ap_paterno")),
+                                Ap_materno = reader1.GetString(reader1.GetOrdinal("ap_materno"))
+                                
+                               
+                            };
+
+                            estudiantes.Add(estudiante1);
+                        }
+
+
+
+
+
+
+                    }
+                    return Ok(new { 
+                        add = true,
+                        estudiantes = estudiantes
+                    });
+
+
+                   
+                }
+            }
+            catch (OracleException ex)
+            {
+                return BadRequest(new { error = "Error al conectar a la base de datos de Oracle: " + ex.Message });
+            }
+        }
+
 
     }
 }

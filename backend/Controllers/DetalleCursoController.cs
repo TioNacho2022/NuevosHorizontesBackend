@@ -20,7 +20,7 @@ namespace backend.Controllers
                 {
                     connection.Open();
 
-                    string query = "SELECT dc.id,dc.curso_id,a.id, a.nombre FROM detalle_curso dc INNER JOIN asignatura a ON dc.asignatura_id=a.id WHERE dc.curso_id = :curso_id";
+                    string query = "SELECT dc.id,dc.curso_id,a.id, a.nombre,a.profesor_id,p.id,p.p_nombre,p.ap_paterno FROM detalle_curso dc INNER JOIN asignatura a ON dc.asignatura_id=a.id INNER JOIN profesor p ON a.profesor_id = p.id WHERE dc.curso_id = :curso_id";
                     OracleCommand command = new OracleCommand(query, connection);
                     command.Parameters.Add(":curso_id", OracleDbType.Int32).Value = curso_id;
                    
@@ -39,6 +39,11 @@ namespace backend.Controllers
                             {
                                 Id = Convert.ToInt32(reader["id"]),
                                 Nombre = reader["nombre"].ToString(),
+                                Profesor = new Profesor()
+                                {
+                                    P_nombre = reader["p_nombre"].ToString(),
+                                    Ap_paterno = reader["ap_paterno"].ToString(),
+                                }
 
                             }
                         };
@@ -64,7 +69,7 @@ namespace backend.Controllers
                 {
                     connection.Open();
 
-                    string query = "SELECT * FROM detalle_curso dc INNER JOIN curso c ON dc.curso_id=c.id WHERE dc.asignatura_id=:asignatura_id ";
+                    string query = "SELECT dc.id AS detalle_curso_id,c.id AS curso_id,dc.asignatura_id,c.nombre FROM detalle_curso dc INNER JOIN curso c ON dc.curso_id=c.id WHERE dc.asignatura_id=:asignatura_id ";
                     OracleCommand command = new OracleCommand(query, connection);
                     command.Parameters.Add(":asignatura_id", OracleDbType.Int32).Value = asignatura_id;
 
@@ -77,10 +82,10 @@ namespace backend.Controllers
                     {
                         DetalleCurso.ResponseCurso detalle_curso = new DetalleCurso.ResponseCurso()
                         {
-                            Id = Convert.ToInt32(reader["id"]),
+                            Id = Convert.ToInt32(reader["detalle_curso_id"]),
                             Curso = new Curso()
                             {
-                                Id = Convert.ToInt32(reader["id"]),
+                                Id = Convert.ToInt32(reader["curso_id"]),
                                 Nombre = Convert.ToString(reader["nombre"]),
                             },
                             Asignatura_id = Convert.ToInt32(reader["asignatura_id"]),

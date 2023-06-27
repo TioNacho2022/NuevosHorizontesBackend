@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Any;
 using Oracle.ManagedDataAccess.Client;
+using Oracle.ManagedDataAccess.Types;
+using static backend.Models.Asistencia;
 
 namespace backend.Controllers
 {
@@ -87,6 +89,76 @@ namespace backend.Controllers
             {
                 return BadRequest(new { error = "Error al conectar a la base de datos de Oracle: " + ex.Message });
             }
+        }
+
+        [HttpPost]
+        public IActionResult AgregarEstudiante(Nota nota)
+        {
+            try
+            {
+
+
+                using (OracleConnection connection = new OracleConnection(connectionString))
+                {
+                    connection.Open();
+
+                    string queryExists = "SELECT COUNT(*) FROM nota WHERE evaluacion_id=:evaluacion_id AND estudiante_id=:estudiante_id AND asignatura_id=:asignatura_id";
+                    OracleCommand commandExists = new OracleCommand(queryExists, connection);
+                    commandExists.Parameters.Add(":evaluacion_id", OracleDbType.Int32).Value = nota.Evaluacion_id;
+                    commandExists.Parameters.Add(":estudiante_id", OracleDbType.Int32).Value = nota.Estudiante_id;
+                    commandExists.Parameters.Add(":asignatura_id", OracleDbType.Int32).Value = nota.Asignatura_id;
+                    int existingCount = Convert.ToInt32(commandExists.ExecuteScalar());
+
+                    if (existingCount > 0)
+                    {
+                        return Ok(new { add = false });
+                    }
+
+
+                    string query = "INSERT INTO nota (id, evaluacion_id, estudiante_id, asignatura_id, nota) " +
+                                    "VALUES (nta_seq.NEXTVAL, :evaluacion_id, :estudiante_id, :asignatura_id, :nota) " +
+                                    "RETURNING id INTO :newId";
+
+                    OracleCommand command = new OracleCommand(query, connection);
+                    command.Parameters.Add(":evaluacion_id", OracleDbType.Int32).Value = nota.Evaluacion_id;
+                    command.Parameters.Add(":estudiante_id", OracleDbType.Varchar2).Value = nota.Estudiante_id;
+                    command.Parameters.Add(":asignatura_id", OracleDbType.Varchar2).Value = nota.Asignatura_id;
+                    command.Parameters.Add(":nota", OracleDbType.Decimal).Value = nota.nota;
+                    
+
+
+
+
+                    OracleParameter newIdParameter = new OracleParameter(":newId", OracleDbType.Int32);
+                    newIdParameter.Direction = System.Data.ParameterDirection.Output;
+                    command.Parameters.Add(newIdParameter);
+
+                    int rowsAffected = command.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        OracleDecimal oracleDecimal = (OracleDecimal)newIdParameter.Value;
+                        int newId = oracleDecimal.ToInt32();
+                        return Ok(new
+                        {
+                            add = true,
+                            id = newId
+                        });
+
+
+                    }
+                    else
+                    {
+                        return BadRequest(new { error = "No se pudo la nota" });
+                    }
+                }
+            }
+            catch (OracleException ex)
+            {
+                return BadRequest(new { error = "Error al conectar a la base de datos de Oracle: " + ex.Message });
+            }
+
+
         }
     }
 }

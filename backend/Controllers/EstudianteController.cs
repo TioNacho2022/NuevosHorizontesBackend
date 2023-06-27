@@ -10,7 +10,7 @@ namespace backend.Controllers
     [ApiController]
     public class EstudianteController : Controller
     {
-        
+
 
         private readonly string connectionString = "WALLET_LOCATION=C:\\Users\\hp\\Oracle\\network\\admin;DATA SOURCE=pnhdata_high;TNS_ADMIN=C:\\Users\\hp\\Oracle\\network\\admin;PERSIST SECURITY INFO=True;USER ID=SISTEMA;PASSWORD=f7svQgqYvczj;";
 
@@ -101,7 +101,7 @@ namespace backend.Controllers
                 {
                     connection.Open();
 
-                    string query = "SELECT e.id, e.rut, e.p_nombre, e.s_nombre, e.ap_paterno, e.ap_materno, e.correo, e.edad, e.curso_ingreso, e.genero, e.curso_id, c.id AS curso_id, c.nombre AS curso_nombre, e.continuidad FROM estudiante e INNER JOIN curso c ON e.curso_id = c.id WHERE e.id = :id";
+                    string query = "SELECT e.id, e.rut, e.p_nombre, e.s_nombre, e.ap_paterno, e.ap_materno, e.correo, e.edad, e.curso_ingreso, e.genero, e.curso_id, c.id AS curso_id, c.nombre AS curso_nombre, e.continuidad,s.id AS sala_id , s.numero AS sala_numero FROM estudiante e LEFT JOIN  curso c ON e.curso_id = c.id INNER JOIN sala s ON c.sala_id = s.id WHERE e.id = :id";
                     OracleCommand command = new OracleCommand(query, connection);
                     command.Parameters.Add(":id", OracleDbType.Int32).Value = id;
 
@@ -121,9 +121,8 @@ namespace backend.Controllers
                         }
                         else
                         {
-
                             cursoId = 0;
-                        };
+                        }
 
                         if (continuidadValue != DBNull.Value)
                         {
@@ -131,9 +130,8 @@ namespace backend.Controllers
                         }
                         else
                         {
-
-                            continuidad = "pendiente";
-                        };
+                            continuidad = "Pendiente";
+                        }
 
                         Estudiante.EstudianteResponse estudiante = new Estudiante.EstudianteResponse()
                         {
@@ -150,8 +148,13 @@ namespace backend.Controllers
                             Curso_id = cursoId,
                             Curso = new Curso()
                             {
-                                Id = Convert.ToInt32(reader["curso_id"]),
+                                Id = (cursoIdValue != DBNull.Value) ? Convert.ToInt32(cursoIdValue) : 0,
                                 Nombre = reader["curso_nombre"].ToString(),
+                                Sala = new Sala
+                                {
+                                    Id = Convert.ToInt32(reader["sala_id"]),
+                                    Numero = Convert.ToInt32(reader["sala_numero"]),
+                                }
                             },
                             Continuidad = continuidad
                         };
@@ -160,10 +163,8 @@ namespace backend.Controllers
                         {
                             get = true,
                             rol = "Estudiante",
-                            usuario = estudiante,
-                            
-                        }
-                           );
+                            usuario = estudiante
+                        });
                     }
                     else
                     {
@@ -537,7 +538,11 @@ namespace backend.Controllers
                         return NotFound(new { error = "No se encontró ningún estudiante con el ID proporcionado" });
                     }
 
-                    
+                    string queryUpdatePendiente = "UPDATE Estudiante SET pendiente = 'f' WHERE id = :id";
+                    OracleCommand commandUpdatePendiente = new OracleCommand(queryUpdatePendiente, connection);
+                    commandUpdatePendiente.Parameters.Add(":id", OracleDbType.Int32).Value = id;
+
+                    int rowsAffectedUpdatePendiente = commandUpdatePendiente.ExecuteNonQuery();
 
                     string query = "UPDATE Estudiante SET curso_id = :curso_id WHERE id = :id";
                                    

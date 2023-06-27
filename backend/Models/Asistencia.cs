@@ -9,6 +9,14 @@
         public int Estado_id { get; set; }
         public string Fecha { get; set; }
 
+        public class Response
+        {
+            public int Id { get; set; }
+            public Bloque.Response Bloque { get; set; }
+            public Estado Estado { get; set; }
+            public string Fecha { get; set; }
+        }
+
         public class Post
         {
             public int Horario_id { get; set; }

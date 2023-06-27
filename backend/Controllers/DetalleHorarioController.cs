@@ -14,6 +14,9 @@ namespace backend.Controllers
         {
             try
             {
+                Console.Write(asignatura_id);
+                Console.Write(curso_id);
+
                 using (OracleConnection connection = new OracleConnection(connectionString))
                 {
 

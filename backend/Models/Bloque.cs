@@ -14,5 +14,13 @@
             public string HorarioFin { get; set; }
             public Dia.Response Dia{ get; set;}
         }
+
+        public class ResponseEstudiante
+        {
+            public int Id { get; set; }
+            public string HorarioInicio { get; set; }
+            public string HorarioFin { get; set; }
+            public Dia.Response Dia { get; set; }
+        }
     }
 }
